@@ -26,9 +26,17 @@ period: 1month, 3month, 6month, 12month, overall
 
 <h4>Get Loved Tracks</h4>
 
-<p>getLoved(lastFMUserName="yourUserName", playlistName = "Loved Tracks"):
+getLoved(lastFMUserName="yourUserName", playlistName = "Loved Tracks"):
 
 <code>main.py getloved "yourUserName"</code>
+
+<h4>Get Geo Top Tracks</h4>
+
+Get the most popular tracks on Last.fm last week by country
+
+getGeoTop(country, limit=50, playlistName = "Geo Top Tracks"):
+
+<code>main.py getgeotop --country=turkey --limit=100</code>
 
 <h2>Requirements:</h2> 
 - <a href = "https://github.com/plamere/spotipy">spotipy</a>
