@@ -1,5 +1,4 @@
 # SpotifyPlaylistGenerator
-# SpotifyPlaylistGenerator
 
 Generate playlists for your spotify account from command line interface: 
 <ul>
