@@ -37,6 +37,12 @@ def getLoved(lastFMUserName=lastFMUserName, playlistName = "Loved Tracks"):
 
 
 
+def getGeoTop(country, limit=50, playlistName = "Geo Top Tracks"):
+    artists, tracks = lastFM.getGeoTopTracks(country = country, limit = limit)
+    generatePlaylist(artists, tracks, playlistName)
+
+
+
 def generatePlaylist(artists, tracks, playlistName):
     
     scope = "playlist-modify-public"
@@ -100,5 +106,6 @@ if __name__ == '__main__':
       'getsimilar': getSimilar,
       'gettop': getTop,
       'getloved' : getLoved,
+      'getgeotop' : getGeoTop,
   })
 
