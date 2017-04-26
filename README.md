@@ -10,19 +10,19 @@ Generate playlists for your spotify account from command line interface:
 <h2> Usage</h2>
 <h4>Get Similar Tracks</h4>
 
-getSimilar(artist, track, limit = 20, playlistName = "Similar Tracks"):
+getSimilar(artist, track, count = 20, playlistName = "Similar Tracks"):
 
-<code>main.py getsimilar --artist="tame impala" --track="let it happen" --limit=20</code>
+<code>main.py getsimilar --artist="tame impala" --track="let it happen" --count=20</code>
 
-<code>main.py getsimilar --artist="empire of the sun" --track="we are the people" --limit=10 --playlistName="example playlist"</code>
+<code>main.py getsimilar --artist="empire of the sun" --track="we are the people" --count=10 --playlistName="example playlist"</code>
 
 <h4>Get Top Tracks</h4>
 
-getTop(lastFMUserName=lastFMUserName, period="1month", limit = 20, playlistName = "Top Tracks"):
+getTop(lastFMUserName=lastFMUserName, period="1month", count = 20, playlistName = "Top Tracks"):
 
 period: 1month, 3month, 6month, 12month, overall
 
-<code>main.py gettop lastFMUserName="yourUserName" --period=6month --limit=30</code>
+<code>main.py gettop lastFMUserName="yourUserName" --period=6month --count=30</code>
 
 <h4>Get Loved Tracks</h4>
 
@@ -34,9 +34,9 @@ getLoved(lastFMUserName="yourUserName", playlistName = "Loved Tracks"):
 
 Get the most popular tracks on Last.fm last week by country
 
-getGeoTop(country, limit=50, playlistName = "Geo Top Tracks"):
+getGeoTop(country, count=50, playlistName = "Geo Top Tracks"):
 
-<code>main.py getgeotop --country=turkey --limit=100</code>
+<code>main.py getgeotop --country=turkey --count=100</code>
 
 <h2>Requirements:</h2> 
 - <a href = "https://github.com/plamere/spotipy">spotipy</a>
