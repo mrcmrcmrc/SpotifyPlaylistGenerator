@@ -30,14 +30,29 @@ getLoved(lastFMUserName="yourUserName", playlistName = "Loved Tracks"):
 
 <code>main.py getloved "yourUserName"</code>
 
-<h4>Get Geo Top Tracks</h4>
+<h4>Get Top Tracks by Country</h4>
 
 Get the most popular tracks on Last.fm last week by country
 
-getGeoTop(country, count=50, playlistName = "Geo Top Tracks"):
+getTopByCountry(country, count=50, playlistName = "Geo Top Tracks"):
 
-<code>main.py getgeotop --country=turkey --count=100</code>
+<code>main.py gettopbycounty --country=turkey --count=100</code>
+
+<h4>Get Top Tracks by an Artist</h4>
+
+getTopByArtist(artist, count = 25, playlistName = None):
+
+<code>main.py gettopbyartist --artist="muse" --count="10"</code>
+
+<h4>Get Top Tracks by Tag</h4>
+
+Get the top tracks tagged by this tag.
+
+getTopByTag (tag, count = 25, playlistName = None):
+
+<code>main.py gettopbytag --tag="indie"</code>
 
 <h2>Requirements:</h2> 
 - <a href = "https://github.com/plamere/spotipy">spotipy</a>
+- <a href = "https://github.com/google/python-fire">python-fire</a>
 
