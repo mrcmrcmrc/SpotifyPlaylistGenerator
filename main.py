@@ -1,10 +1,14 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 import spotipy
 import spotipy.util as util
 import lastFM
 import fire
 import ConfigParser
+import sys
 
+reload(sys)    # to re-enable sys.setdefaultencoding()
+sys.setdefaultencoding('utf-8')
 
 config = ConfigParser.RawConfigParser()
 config.read('config.ini')
@@ -16,64 +20,113 @@ lastFMUserName = config.get('Last.FM', 'UserName')
 
 
 
-def getSimilar(artist, track, limit = 20, playlistName = "Similar Tracks"):
-    print "%s similar tracks to %s" % (limit, track)
-    artists,tracks = lastFM.getSimilar(artist = artist, track = track, limit = limit)
-    generatePlaylist(artists, tracks, playlistName)
+def getSimilar(artist, track, count = 20, playlistName = None):
+    
+    print "%s similar tracks to %s" % (count, track)
+    result = lastFM.getSimilar(artist = artist, track = track, limit = count)
+
+    if result is not None:
+        if playlistName is None:
+            playlistName = "Similar Songs to %s" % track.capitalize()
+
+        generatePlaylist(result, playlistName)
+        
 
 
 
-def getTop(lastFMUserName=lastFMUserName, period="1month", limit = 20, playlistName = "Top Tracks"):
-    print "%s\'s top %s tracks (%s)" % (lastFMUserName, limit, period)
-    artists, tracks = lastFM.getTopTracks(lastFMUserName, period=period, limit=limit) #period="overall"
-    generatePlaylist(artists, tracks, playlistName)
+def getTop(lastFMUserName = lastFMUserName, period = "1month", count = 20, playlistName = None):
+    
+    print "%s\'s top %s tracks (%s)" % (lastFMUserName, count, period)
+    result = lastFM.getTopTracks(lastFMUserName, period = period, limit = count) #period="overall"
+    
+    if result is not None:
+        if playlistName is None:
+            playlistName = "%s\'s Top Songs" % lastFMUserName
+
+        generatePlaylist (result, playlistName)
 
 
 
-def getLoved(lastFMUserName=lastFMUserName, playlistName = "Loved Tracks"):
+def getLoved(lastFMUserName = lastFMUserName, playlistName = None):
+    
     print "%s\'s loved tracks" % lastFMUserName
-    artists, tracks = lastFM.getLovedTracks(lastFMUserName)
-    generatePlaylist(artists, tracks, playlistName)
+    result = lastFM.getLovedTracks(lastFMUserName)
+
+    if result is not None:
+        if playlistName is None:
+            playlistName = "%s\'s Loved Songs" % lastFMUserName
+
+        generatePlaylist (result, playlistName)
+
+
+def getGeoTop(country, count = 50, playlistName = None):
+   
+    print "%s Top %s" % (country, count)
+    result = lastFM.getGeoTopTracks(country = country, limit = count)
+
+    if result is not None:
+        if playlistName is None:
+            playlistName = "%s Top %s" % (country.capitalize(), count)
+     
+        generatePlaylist (result, playlistName)
 
 
 
-def getGeoTop(country, limit=50, playlistName = "Geo Top Tracks"):
-    artists, tracks = lastFM.getGeoTopTracks(country = country, limit = limit)
-    generatePlaylist(artists, tracks, playlistName)
-
-
-
-def generatePlaylist(artists, tracks, playlistName):
+def getArtistTop(artist, count = 25, playlistName = None):
     
+    print "Top Tracks by %s" % artist.capitalize()
+    result = lastFM.getArtistTopTracks(artist = artist, limit = count)
+
+    if result is not None:
+        if playlistName is None:
+            playlistName = "Top Songs by %s" % artist.capitalize()
+
+        generatePlaylist (result, playlistName)
+
+
+
+def getTopTracksForTag (tag, count = 25, playlistName = None):
+
+    print "Top %s %s Songs" % (count, tag)
+    result = lastFM.getTopTracksForTag(tag = tag, limit = count)
+
+    if result is not None:
+        if playlistName is None:
+            playlistName = "Top %s Songs" % tag.capitalize()
+     
+        generatePlaylist (result, playlistName)
+
+
+
+def generatePlaylist(result, playlistName):
     scope = "playlist-modify-public"
-    
     token = util.prompt_for_user_token(username=username, client_id=client_id, client_secret=client_secret, redirect_uri="http://localhost:80", scope=scope)
     
     track_IDs = []
     filters=['/', '.', 'ft', 'feat', '-', '[', '(', '~']
-    if len(artists) is not 0:
-        sp = spotipy.Spotify()
-        for index, artist in enumerate(artists):
-            try:
-                search_res = sp.search(q=artist + " " + tracks[index], type='track', limit=1, market='TR')
-            except:
-                
-                 "err"
-            if len(search_res['tracks']['items']) == 0:
-                for letter in tracks[index]:
-                    if letter in filters:
-                        search_res = sp.search(q=artist + " " + tracks[index].split(letter)[0], type='track', limit=1, market='TR')
-                        break
-                if len(search_res['tracks']['items']) > 0:
-                    if search_res['tracks']['items'][0]['id'] not in track_IDs:
-                        track_IDs.append(search_res['tracks']['items'][0]['id'])
-                        print artist + " - " + tracks[index] + "****************"
-                else:
-                    print "couldn't find " + artist + " - " + tracks[index]
-                continue
-            if search_res['tracks']['items'][0]['id'] not in track_IDs:
-                track_IDs.append(search_res['tracks']['items'][0]['id'])
-                print artist + " - " + tracks[index] + "............."
+
+    sp = spotipy.Spotify()
+    for r in result:
+        try:
+            search_res = sp.search(q=r[0] + " " + r[1], type='track', limit=1, market='TR')
+        except:
+            
+             "err"
+        if len(search_res['tracks']['items']) == 0:
+            for letter in r[1]:
+                if letter in filters:
+                    search_res = sp.search(q=r[0] + " " + r[1].split(letter)[0], type='track', limit=1, market='TR')
+                    break
+            if len(search_res['tracks']['items']) > 0:
+                if search_res['tracks']['items'][0]['id'] not in track_IDs:
+                    track_IDs.append(search_res['tracks']['items'][0]['id'])
+                    print r[0] + " - " + r[1] + "****************"
+            else:
+                print r[0] + " - " + r[1] + " xxxxxxxxxxx not found xxxxxxxxxxxx"
+            continue
+        if search_res['tracks']['items'][0]['id'] not in track_IDs:
+            track_IDs.append(search_res['tracks']['items'][0]['id'])
+            print r[0] + " - " + r[1] + " ............."
 
     if len(track_IDs) is not 0:
         if token:
@@ -102,10 +155,13 @@ def main():
 
 
 if __name__ == '__main__':
-  fire.Fire({
+
+    fire.Fire({
       'getsimilar': getSimilar,
       'gettop': getTop,
       'getloved' : getLoved,
       'getgeotop' : getGeoTop,
+      'getartisttop' : getArtistTop,
+      'gettoptracksfortag' : getTopTracksForTag
   })
 
