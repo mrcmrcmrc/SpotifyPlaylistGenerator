@@ -5,6 +5,7 @@ Generate playlists for your spotify account from command line interface:
 <li>similar tracks to any track (Uses last.fm's similarTracks method) </li>
 <li>your loved tracks from last.fm</li>
 <li>your top tracks (weekly, monthly,...) from last.fm</li>
+<li>top tracks by an artist, country or tag.</li>
 </ul>
 
 <h2> Usage</h2>
