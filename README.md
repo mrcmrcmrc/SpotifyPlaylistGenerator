@@ -9,7 +9,7 @@ Generate playlists for your spotify account from command line interface:
 </ul>
 
 <h2> Usage</h2>
-<h4>Get Similar Tracks</h4>
+<h3>Get Similar Tracks</h3>
 
 parameters: 
 <ul>
@@ -23,7 +23,7 @@ parameters:
 
 <code>main.py getsimilar --artist="empire of the sun" --track="we are the people" --count=10 --playlistName="example playlist"</code>
 
-<h4>Get Top Tracks</h4>
+<h3>Get Top Tracks</h3>
 
 parameters: 
 <ul>
@@ -35,7 +35,7 @@ parameters:
 
 <code>main.py gettop lastFMUserName="yourUserName" --period=6month --count=30</code>
 
-<h4>Get Loved Tracks</h4>
+<h3>Get Loved Tracks</h3>
 
 parameters: 
 <ul>
@@ -45,7 +45,7 @@ parameters:
 
 <code>main.py getloved "yourUserName"</code>
 
-<h4>Get Top Tracks by Country</h4>
+<h3>Get Top Tracks by Country</h3>
 
 Get the most popular tracks on Last.fm last week by country
 
@@ -58,7 +58,7 @@ parameters:
 
 <code>main.py gettopbycounty --country=turkey --count=100</code>
 
-<h4>Get Top Tracks by an Artist</h4>
+<h3>Get Top Tracks by an Artist</h3>
 
 parameters: 
 <ul>
@@ -69,8 +69,10 @@ parameters:
 
 <code>main.py gettopbyartist --artist="muse" --count="10"</code>
 
-<h4>Get Top Tracks by Tag</h4>
+<h3>Get Top Tracks by Tag</h3>
+
 Get the top tracks tagged by this tag.
+
 parameters: 
 <ul>
 <li>tag (required):</li>
@@ -80,8 +82,10 @@ parameters:
 
 <code>main.py gettopbytag --tag="indie"</code>
 
-<h4>Get Chart Top Tracks</h4>
+<h3>Get Chart Top Tracks</h3>
+
 Get the top tracks chart
+
 parameters: 
 <ul>
 <li>count (optional): default = 25</li>
@@ -90,11 +94,15 @@ parameters:
 
 <code>main.py getcharttoptracks"</code>
 
-<h4>Show Top Tags</h4>
+<h3>Show Top Tags</h3>
+
 Use this to view the most popular tags on Last.fm
+
 <code>main.py showtoptags</code>
 
-<h2>Requirements:</h2> 
-- <a href = "https://github.com/plamere/spotipy">spotipy</a>
-- <a href = "https://github.com/google/python-fire">python-fire</a>
+<h2>Requirements:</h2>
+<ul>
+<li><a href = "https://github.com/plamere/spotipy">spotipy</a></li>
+<li><a href = "https://github.com/google/python-fire">python-fire</a></li>
+</ul>
 
