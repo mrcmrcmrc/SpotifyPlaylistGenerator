@@ -59,7 +59,7 @@ def getLoved(lastFMUserName = lastFMUserName, playlistName = None):
         generatePlaylist (result, playlistName)
 
 
-def getGeoTop(country, count = 50, playlistName = None):
+def getTopByCountry(country, count = 50, playlistName = None):
    
     print "%s Top %s" % (country, count)
     result = lastFM.getGeoTopTracks(country = country, limit = count)
@@ -72,7 +72,7 @@ def getGeoTop(country, count = 50, playlistName = None):
 
 
 
-def getArtistTop(artist, count = 25, playlistName = None):
+def getTopByArtist(artist, count = 25, playlistName = None):
     
     print "Top Tracks by %s" % artist.capitalize()
     result = lastFM.getArtistTopTracks(artist = artist, limit = count)
@@ -85,14 +85,37 @@ def getArtistTop(artist, count = 25, playlistName = None):
 
 
 
-def getTopTracksForTag (tag, count = 25, playlistName = None):
+def getTopByTag (tag, count = 25, playlistName = None):
 
     print "Top %s %s Songs" % (count, tag)
-    result = lastFM.getTopTracksForTag(tag = tag, limit = count)
+    result = lastFM.getTopTracksByTag(tag = tag, limit = count)
 
     if result is not None:
         if playlistName is None:
             playlistName = "Top %s Songs" % tag.capitalize()
+     
+        generatePlaylist (result, playlistName)
+
+
+
+def showTopTags ():
+    result = lastFM.getTopTags()
+    if result is not None:
+        index = 0
+        for i in range(len(result)/5):
+            print "%-20s\t %-20s\t %-20s\t %-20s\t %-20s" % (result[index], result[index+1], result[index+2], result[index+3], result[index+4])
+            index = index + 5
+
+
+
+def getChartTopTracks (count = 25, playlistName = None):
+    
+    print "Top Songs by Last.FM"
+    result = lastFM.getChartTopTracks(limit = count)
+
+    if result is not None:
+        if playlistName is None:
+            playlistName = "Top Songs by Last.FM"
      
         generatePlaylist (result, playlistName)
 
@@ -105,6 +128,8 @@ def generatePlaylist(result, playlistName):
     track_IDs = []
     filters=['/', '.', 'ft', 'feat', '-', '[', '(', '~']
 
+    count = len(result)
+    found = 0
     sp = spotipy.Spotify()
     for r in result:
         try:
@@ -120,13 +145,21 @@ def generatePlaylist(result, playlistName):
             if len(search_res['tracks']['items']) > 0:
                 if search_res['tracks']['items'][0]['id'] not in track_IDs:
                     track_IDs.append(search_res['tracks']['items'][0]['id'])
-                    print r[0] + " - " + r[1] + "****************"
+                    found = found + 1
+                    print '\r{0} - {1} [{2} of {3}]{4}\r'.format(r[0], r[1], found, count, ' '*50),
+             
+
             else:
-                print r[0] + " - " + r[1] + " xxxxxxxxxxx not found xxxxxxxxxxxx"
+                found = found + 1
+                print '\r{0} - {1} NOT FOUND [{2} of {3}]{4}\r'.format(r[0], r[1], found, count, ' '*50),
+
             continue
         if search_res['tracks']['items'][0]['id'] not in track_IDs:
             track_IDs.append(search_res['tracks']['items'][0]['id'])
-            print r[0] + " - " + r[1] + " ............."
+            found = found + 1
+            #sys.stdout.write('\r%s - %s\t[%d of %d]\033[K\n' % (r[0], r[1], found, count))
+            print '{0} - {1} [{2} of {3}]{4}\r'.format(r[0], r[1], found, count, ' '*50),
+    
 
     if len(track_IDs) is not 0:
         if token:
@@ -142,7 +175,7 @@ def generatePlaylist(result, playlistName):
                     else:
                         sp.user_playlist_add_tracks(username, playlist.get('id'), track_IDs[i*100:(i+1)*100])
                         i += 1
-                print playlistName + " has been created successfully"
+                print "\n" + playlistName + " has been created successfully"
 
         else:
             print("Can't get token for ", username)
@@ -160,8 +193,10 @@ if __name__ == '__main__':
       'getsimilar': getSimilar,
       'gettop': getTop,
       'getloved' : getLoved,
-      'getgeotop' : getGeoTop,
-      'getartisttop' : getArtistTop,
-      'gettoptracksfortag' : getTopTracksForTag
+      'gettopbycounty' : getTopByCountry,
+      'gettopbyartist' : getTopByArtist,
+      'gettopbytag' : getTopByTag,
+      'showtoptags' : showTopTags,
+      'getcharttoptracks' : getChartTopTracks
   })
 
