@@ -14,6 +14,8 @@ similarTracksURL = "https://ws.audioscrobbler.com/2.0/?method=track.getsimilar"
 geoTopTracksURL = "https://ws.audioscrobbler.com/2.0/?method=geo.gettoptracks"
 artistTopTracksURL = "https://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks"
 tagTopTracksURL = "https://ws.audioscrobbler.com/2.0/?method=tag.gettoptracks"
+topTagsURL = "https://ws.audioscrobbler.com/2.0/?method=tag.gettoptags"
+chartTopTracks = "https://ws.audioscrobbler.com/2.0/?method=chart.gettoptracks"
 
 
 
@@ -152,9 +154,9 @@ def getArtistTopTracks (artist, limit):
 
 
 
-def getTopTracksForTag (tag, limit):
+def getTopTracksByTag (tag, limit):
     result = []
-    URL = tagTopTracksURL + "&tag=" + tag + "&limit=" + str(limit) +"&api_key=" + API_KEY + "&format=json"
+    URL = tagTopTracksURL + "&tag=" + tag + "&limit=" + str(limit) + "&api_key=" + API_KEY + "&format=json"
     
     try:
         response = urllib.urlopen(URL)
@@ -174,3 +176,50 @@ def getTopTracksForTag (tag, limit):
             result.append(temp_list)
 
     return result
+
+
+
+def getTopTags ():
+    result = []
+    URL = topTagsURL + "&api_key=" + API_KEY + "&format=json"
+
+    try:
+        response = urllib.urlopen(URL)
+        data = json.loads(response.read())
+    except:
+        return None
+
+    if 'error' in data:
+        print data
+        return None
+    else:
+        for t in data['toptags']['tag']:
+            result.append(t['name'])
+
+    return result
+
+
+
+def getChartTopTracks (limit):
+    result = []
+    URL = chartTopTracks + "&limit=" + str(limit) + "&api_key=" + API_KEY + "&format=json"
+    
+    try:
+        response = urllib.urlopen(URL)
+        data = json.loads(response.read())
+    except:
+        return None
+
+    if 'error' in data:
+        print data['message']
+        return None
+    else:
+        for t in data['tracks']['track']:
+            temp_list = []
+            temp_list.append(t['artist']['name'])
+            temp_list.append(t['name'])
+
+            result.append(temp_list)
+
+    return result
+
