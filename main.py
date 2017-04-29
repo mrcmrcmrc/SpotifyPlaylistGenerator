@@ -49,12 +49,12 @@ def getTop(lastFMUserName = lastFMUserName, period = "1month", count = 20, playl
 
 def getLoved(lastFMUserName = lastFMUserName, playlistName = None):
     
-    print "%s\'s loved tracks" % lastFMUserName
+    print "loved tracks by %s" % lastFMUserName
     result = lastFM.getLovedTracks(lastFMUserName)
 
     if result is not None:
         if playlistName is None:
-            playlistName = "%s\'s Loved Songs" % lastFMUserName
+            playlistName = "Loved Songs by %s" % lastFMUserName
 
         generatePlaylist (result, playlistName)
 
@@ -72,14 +72,14 @@ def getTopByCountry(country, count = 50, playlistName = None):
 
 
 
-def getTopByArtist(artist, count = 25, playlistName = None):
+def getTopByArtist(artist, count = 20, playlistName = None):
     
-    print "Top Tracks by %s" % artist.capitalize()
+    print "The best %s songs" % artist.capitalize()
     result = lastFM.getArtistTopTracks(artist = artist, limit = count)
 
     if result is not None:
         if playlistName is None:
-            playlistName = "Top Songs by %s" % artist.capitalize()
+            playlistName = "The best %s songs" % artist.capitalize()
 
         generatePlaylist (result, playlistName)
 
@@ -87,7 +87,7 @@ def getTopByArtist(artist, count = 25, playlistName = None):
 
 def getTopByTag (tag, count = 25, playlistName = None):
 
-    print "Top %s %s Songs" % (count, tag)
+    print "Top %s Songs" % (tag)
     result = lastFM.getTopTracksByTag(tag = tag, limit = count)
 
     if result is not None:
@@ -99,6 +99,7 @@ def getTopByTag (tag, count = 25, playlistName = None):
 
 
 def showTopTags ():
+    """top tags from last.fm"""
     result = lastFM.getTopTags()
     if result is not None:
         index = 0
@@ -133,14 +134,14 @@ def generatePlaylist(result, playlistName):
     sp = spotipy.Spotify()
     for r in result:
         try:
-            search_res = sp.search(q=r[0] + " " + r[1], type='track', limit=1, market='TR')
+            search_res = sp.search(q='artist:{0} track:{1}'.format(r[0], r[1]), type='track', limit=1, market='TR')
         except:
             
              "err"
         if len(search_res['tracks']['items']) == 0:
             for letter in r[1]:
                 if letter in filters:
-                    search_res = sp.search(q=r[0] + " " + r[1].split(letter)[0], type='track', limit=1, market='TR')
+                    search_res = sp.search(q='artist:{0} track:{1}'.format(r[0], r[1]), type='track', limit=1, market='TR')
                     break
             if len(search_res['tracks']['items']) > 0:
                 if search_res['tracks']['items'][0]['id'] not in track_IDs:
