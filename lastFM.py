@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*-coding=utf-8 -*-
 import urllib
+import requests
 import json
 import ConfigParser
 
@@ -8,23 +9,7 @@ config = ConfigParser.RawConfigParser()
 config.read('config.ini')
 
 API_KEY = config.get('Last.FM', 'API_KEY')
-userLovedTracksURL = "https://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks"
-userTopTracksURL = "https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks"
-userTopAlbumsURL = "https://ws.audioscrobbler.com/2.0/?method=user.gettopalbums"
-similarTracksURL = "https://ws.audioscrobbler.com/2.0/?method=track.getsimilar"
-geoTopTracksURL = "https://ws.audioscrobbler.com/2.0/?method=geo.gettoptracks"
-artistTopTracksURL = "https://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks"
-tagTopTracksURL = "https://ws.audioscrobbler.com/2.0/?method=tag.gettoptracks"
-topTagsURL = "https://ws.audioscrobbler.com/2.0/?method=tag.gettoptags"
-chartTopTracks = "https://ws.audioscrobbler.com/2.0/?method=chart.gettoptracks"
-artistTopTagsURL = "https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags"
-similarTagsURL = "https://ws.audioscrobbler.com/2.0/?method=tag.getsimilar"
-topTagsChartURL = "https://ws.audioscrobbler.com/2.0/?method=chart.gettoptags"
-tagTopArtistsURL = "https://ws.audioscrobbler.com/2.0/?method=tag.gettopartists"
-trackTopTagsURL = "https://ws.audioscrobbler.com/2.0/?method=track.gettoptags"
-albumTopTagsURL = "https://ws.audioscrobbler.com/2.0/?method=album.gettoptags"
-similarArtistsURL = "https://ws.audioscrobbler.com/2.0/?method=artist.getSimilar"
-tagTopAlbumsURL = "https://ws.audioscrobbler.com/2.0/?method=tag.getTopAlbums"
+URL = "https://ws.audioscrobbler.com/2.0/"
 
 
 def getLovedTracks(username):
@@ -33,25 +18,26 @@ def getLovedTracks(username):
     nextPage = True
     
     while nextPage:
-        URL = userLovedTracksURL + "&user=" + username + "&api_key=" + API_KEY + "&page=" + str(page) + "&format=json"
+        params = {'method' : 'user.getlovedtracks', 'user' : username, 'page' : page, 'api_key': API_KEY, 'format' : 'json'}
+        
         try:
-            response = urllib.urlopen(URL)
-            data = json.loads(response.read())
-        except:
+            response = requests.post(URL, data=params, timeout=5).json()
+        except requests.exceptions.RequestException as e:
+            print e
             return None
 
-        if 'error' in data:
-            print data['message']
+        if 'error' in response:
+            print response['message']
             return None
         else:
-            for t in data['lovedtracks']['track']:
+            for track in response['lovedtracks']['track']:
                 temp_list = []
-                temp_list.append(t['artist']['name'])
-                temp_list.append(t['name'])
+                temp_list.append(track['artist']['name'])
+                temp_list.append(track['name'])
 
                 result.append(temp_list)
 
-            totalPages = data['lovedtracks']['@attr']['totalPages']
+            totalPages = response['lovedtracks']['@attr']['totalPages']
             if int(totalPages) > page:
                 page += 1
             else:
@@ -60,75 +46,105 @@ def getLovedTracks(username):
 
 
 
-def getTopTracks(username, period, limit):
+def getTopTracks(username, period, limit, includePC = False):
     #periods: overall | 7day | 1month | 3month | 6month | 12month
-    URL = userTopTracksURL + "&user=" + username + "&period=" + period + "&limit=" + str(limit) + "&api_key=" + API_KEY + "&format=json"
+    params = {'method' : 'user.gettoptracks', 'user' : username, 'period' : period, 'limit' : limit, 'api_key': API_KEY, 'format' : 'json'}    
     result = []
     try:
-        response = urllib.urlopen(URL)
-        data = json.loads(response.read())
-    except:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
         return None
 
-    if 'error' in data:
-        print data['message']
+    if 'error' in response:
+        print response['message']
         return None
     else:
-        for t in data['toptracks']['track']:
+        for track in response['toptracks']['track']:
             temp_list = []
-            temp_list.append(t['artist']['name'])
-            temp_list.append(t['name'])
-
+            temp_list.append(track['artist']['name'])
+            temp_list.append(track['name'])
+            
+            if includePC is True:
+                temp_list.append(track['playcount'])
+            
             result.append(temp_list)
-    
     return result
 
 
 
-def getTopAlbums(username, period, limit):
-    URL = userTopAlbumsURL + "&user=" + username + "&period=" + period + "&limit=" + str(limit) + "&api_key=" + API_KEY + "&format=json"
+def getTopAlbums(username, period, limit, includePC = False):
+    params = {'method' : 'user.gettopalbums', 'user' : username, 'period' : period, 'limit' : limit, 'api_key': API_KEY, 'format' : 'json'} 
     result = []
     try:
-        response = urllib.urlopen(URL)
-        data = json.loads(response.read())
-    except:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
         return None
 
-    if 'error' in data:
-        print data['message']
+    if 'error' in response:
+        print response['message']
         return None
     else:
-        for t in data['topalbums']['album']:
+        for album in response['topalbums']['album']:
             temp_list = []
-            temp_list.append(t['artist']['name'])
-            temp_list.append(t['name'])
+            temp_list.append(album['artist']['name'])
+            temp_list.append(album['name'])
 
+            if includePC is True:
+                temp_list.append(album['playcount'])
+            
             result.append(temp_list)
     
     return result    
 
 
 
+def getTopArtists(username, period, limit, includePC = False):
+    params = {'method' : 'user.gettopartists', 'user' : username, 'period' : period, 'limit' : limit, 'api_key': API_KEY, 'format' : 'json'} 
+    result = []
+    
+    try:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
+        return None
+
+    if 'error' in response:
+        print response['message']
+        return None
+    else:
+        for artist in response['topartists']['artist']:
+            temp_list = []
+            temp_list.append(artist['name'])
+
+            if includePC is True:
+                temp_list.append(artist['playcount'])
+            
+            result.append(temp_list)
+    
+    return result   
+
+
+
 def getSimilar(artist, track, limit):
+    params = {'method' : 'track.getsimilar', 'artist' : artist, 'track' : track, 'limit' : limit, 'api_key': API_KEY, 'format' : 'json', 'autocorrect' : '1'} 
     result = []
-    URL = similarTracksURL + "&artist=" + artist + "&track=" + track + "&api_key=" + API_KEY + "&limit=" + str(
-        limit) + "&autocorrect=1" + "&format=json"
     
     try:
-        response = urllib.urlopen(URL)
-        data = json.loads(response.read())
-    except:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
         return None
 
-    if 'error' in data:
-        print data['message']
+    if 'error' in response:
+        print response['message']
         return None
     else:
-        founded_track = len(data["similartracks"]["track"])
-        for i in range(founded_track):
+        for t in response['similartracks']['track']:
             temp_list = []
-            temp_list.append(data["similartracks"]["track"][i]["artist"]["name"])
-            temp_list.append(data["similartracks"]["track"][i]["name"])
+            temp_list.append(t["artist"]["name"])
+            temp_list.append(t["name"])
 
             result.append(temp_list)
 
@@ -136,49 +152,70 @@ def getSimilar(artist, track, limit):
 
 
 
-def getGeoTopTracks (country, limit):
+def getGeoTopTracks (country, limit):    
+    params = {'method' : 'geo.gettoptracks', 'country' : country, 'limit' : limit, 'api_key': API_KEY, 'format' : 'json'} 
     result = []
-    URL = geoTopTracksURL + "&country=" + country + "&api_key=" + API_KEY + "&limit=" + str(limit) +  "&format=json"
     
     try:
-        response = urllib.urlopen(URL)
-        data = json.loads(response.read())
-    except:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
         return None
 
-    if 'error' in data:
-        print data['message']
+    if 'error' in response:
+        print response['message']
         return None
     else:
-        for t in data['tracks']['track']:
+        for track in response['tracks']['track']:
             temp_list = []
-            temp_list.append(t['artist']['name'])
-            temp_list.append(t['name'])
+            temp_list.append(track['artist']['name'])
+            temp_list.append(track['name'])
 
             result.append(temp_list)
 
     return result
+
+
+
+def getGeoTopArtists (country, limit):    
+    params = {'method' : 'geo.gettopartists', 'country' : country, 'limit' : limit, 'api_key': API_KEY, 'format' : 'json'} 
+    result = []
+    
+    try:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
+        return None
+
+    if 'error' in response:
+        print response['message']
+        return None
+    else:
+        for artist in response['topartists']['artist']:
+            result.append(artist['name'])
+
+    return result   
 
 
 
 def getArtistTopTracks (artist, limit):
+    params = {'method' : 'artist.gettoptracks', 'artist' : artist, 'limit' : limit, 'api_key': API_KEY, 'format' : 'json'} 
     result = []
-    URL = artistTopTracksURL + "&artist=" + artist + "&api_key=" + API_KEY + "&limit=" + str(limit) + "&format=json"
-        
+    
     try:
-        response = urllib.urlopen(URL)
-        data = json.loads(response.read())
-    except:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
         return None
 
-    if 'error' in data:
-        print data['message']
+    if 'error' in response:
+        print response['message']
         return None
     else:
-        for t in data['toptracks']['track']:
+        for track in response['toptracks']['track']:
             temp_list = []
             temp_list.append(artist)
-            temp_list.append(t['name'])
+            temp_list.append(track['name'])
 
             result.append(temp_list)
 
@@ -187,23 +224,23 @@ def getArtistTopTracks (artist, limit):
 
 
 def getTopTracksByTag (tag, limit):
+    params = {'method' : 'tag.gettoptracks', 'tag' : tag, 'limit' : limit, 'api_key': API_KEY, 'format' : 'json'} 
     result = []
-    URL = tagTopTracksURL + "&tag=" + tag + "&limit=" + str(limit) + "&api_key=" + API_KEY + "&format=json"
     
     try:
-        response = urllib.urlopen(URL)
-        data = json.loads(response.read())
-    except:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
         return None
 
-    if 'error' in data:
-        print data['message']
+    if 'error' in response:
+        print response['message']
         return None
     else:
-        for t in data['tracks']['track']:
+        for track in response['tracks']['track']:
             temp_list = []
-            temp_list.append(t['artist']['name'])
-            temp_list.append(t['name'])
+            temp_list.append(track['artist']['name'])
+            temp_list.append(track['name'])
 
             result.append(temp_list)
 
@@ -212,44 +249,44 @@ def getTopTracksByTag (tag, limit):
 
 
 def getTopTags ():
+    params = {'method' : 'tag.gettoptags', 'api_key': API_KEY, 'format' : 'json'} 
     result = []
-    URL = topTagsURL + "&api_key=" + API_KEY + "&format=json"
-
+    
     try:
-        response = urllib.urlopen(URL)
-        data = json.loads(response.read())
-    except:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
         return None
 
-    if 'error' in data:
-        print data
+    if 'error' in response:
+        print response['message']
         return None
     else:
-        for t in data['toptags']['tag']:
-            result.append(t['name'])
+        for tag in response['toptags']['tag']:
+            result.append(tag['name'])
 
     return result
 
 
 
 def getChartTopTracks (limit):
+    params = {'method' : 'chart.gettoptracks', 'limit' : limit, 'api_key': API_KEY, 'format' : 'json'} 
     result = []
-    URL = chartTopTracks + "&limit=" + str(limit) + "&api_key=" + API_KEY + "&format=json"
     
     try:
-        response = urllib.urlopen(URL)
-        data = json.loads(response.read())
-    except:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
         return None
 
-    if 'error' in data:
-        print data['message']
+    if 'error' in response:
+        print response['message']
         return None
     else:
-        for t in data['tracks']['track']:
+        for track in response['tracks']['track']:
             temp_list = []
-            temp_list.append(t['artist']['name'])
-            temp_list.append(t['name'])
+            temp_list.append(track['artist']['name'])
+            temp_list.append(track['name'])
 
             result.append(temp_list)
 
@@ -258,23 +295,23 @@ def getChartTopTracks (limit):
 
 
 def getTopTagsForArtist (artist): #artist.getTopTags
+    params = {'method' : 'artist.gettoptags', 'artist' : artist, 'api_key': API_KEY, 'format' : 'json'} 
     result = []
-    URL = artistTopTagsURL + "&artist=" + artist + "&api_key=" + API_KEY + "&format=json" + "&autocorrect=1"
-
+    
     try:
-        response = urllib.urlopen(URL)
-        data = json.loads(response.read())
-    except:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
         return None
 
-    if 'error' in data:
-        print data
+    if 'error' in response:
+        print response['message']
         return None
     else:
-        for t in data['toptags']['tag']:
+        for tag in response['toptags']['tag']:
             temp_list = []
-            temp_list.append(t['name'])
-            temp_list.append(t['count'])
+            temp_list.append(tag['name'])
+            temp_list.append(ag['count'])
             
             result.append(temp_list)
 
@@ -282,111 +319,115 @@ def getTopTagsForArtist (artist): #artist.getTopTags
 
 
 
-def getSimilarTags (tag):
-    result = []
-    URL = similarTagsURL + "&tag=" + tag + "&api_key=" + API_KEY + "&format=json"
-
-    try:
-        response = urllib.urlopen(URL)
-        data = json.loads(response.read())
-
-    except:
-        return None
-
-    if 'error' in data:
-        print data
-        return None
-    else:
-        pass
+def getSimilarTags (tag): #tag.getSimilar
+    pass
 
 
 
 def getTopTagsChart ():
+    params = {'method' : 'chart.gettoptags', 'api_key': API_KEY, 'format' : 'json'} 
     result = []
-    URL = topTagsChartURL + "&api_key=" + API_KEY + "&format=json"
-
+    
     try:
-        response = urllib.urlopen(URL)
-        data = json.loads(response.read())
-
-    except:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
         return None
 
-    if 'error' in data:
-        print data
+    if 'error' in response:
+        print response['message']
         return None
     else:
-        for t in data['tags']['tag']:
-            result.append(t['name'])
+        for tag in response['tags']['tag']:
+            result.append(tag['name'])
 
     return result
 
 
 
-def getTagTopArtists (tag, limit): #tag.getTopArtist
+def getTopArtistsChart ():
+    params = {'method' : 'chart.gettopartists', 'api_key': API_KEY, 'format' : 'json'} 
     result = []
-    URL = tagTopArtistsURL + "&tag=" + tag + "&api_key=" + API_KEY + "&limit=" + str(limit) + "&format=json"
-
+    
     try:
-        response = urllib.urlopen(URL)
-        data = json.loads(response.read())
-
-    except:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
         return None
 
-    if 'error' in data:
-        print data
+    if 'error' in response:
+        print response['message']
         return None
     else:
-        for artist in data['topartists']['artist']:
+        for artist in response['artists']['artist']:
+            result.append(artist['name'])
+
+    return result 
+
+
+
+def getTagTopArtists (tag, limit): #tag.getTopArtist
+    params = {'method' : 'tag.gettopartists', 'tag' : tag, 'limit' : limit, 'api_key': API_KEY, 'format' : 'json'} 
+    result = []
+    
+    try:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
+        return None
+
+    if 'error' in response:
+        print response['message']
+        return None
+    else:
+        for artist in response['topartists']['artist']:
             result.append(artist['name'])
 
     return result
 
 
 
-def getTopTagsForTrack (artist, track): #track.getTopTags
+def getTopTagsForTrack (artist, track, limit = 100): #track.getTopTags
+    params = {'method' : 'track.gettoptags', 'artist' : artist, 'track' : track, 'limit' : limit, 'api_key': API_KEY, 'format' : 'json'} 
     result = []
-    URL = trackTopTagsURL + "&artist=" + artist  + "&track=" + track + "&api_key=" + API_KEY  + "&format=json" + "&autocorrect=1"
-
+    
     try:
-        response = urllib.urlopen(URL)
-        data = json.loads(response.read())
-
-    except:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
         return None
 
-    if 'error' in data:
-        print data
+    if 'error' in response:
+        print response['message']
         return None
     else:
-        for tag in data['toptags']['tag']:
+        for tag in response['toptags']['tag']:
             temp_list = []
             temp_list.append(tag['name'])
             temp_list.append(tag['count'])
             
             result.append(temp_list)
-
+            if len(result) == limit:
+                return result
     return result
 
 
 
 def getTopTagsForAlbum (artist, album): #album.getTopTags
+    params = {'method' : 'album.gettoptags', 'artist' : artist, 'album' : album, 'api_key': API_KEY, 'format' : 'json'} 
     result = []
-    URL = albumTopTagsURL + "&artist=" + artist  + "&album=" + album + "&api_key=" + API_KEY  + "&format=json" + "&autocorrect=1"
-
+    
     try:
-        response = urllib.urlopen(URL)
-        data = json.loads(response.read())
-
-    except:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
         return None
 
-    if 'error' in data:
-        print data
+    if 'error' in response:
+        print response['message']
         return None
     else:
-        for tag in data['toptags']['tag']:
+        for tag in response['toptags']['tag']:
             temp_list = []
             temp_list.append(tag['name'])
             temp_list.append(tag['count'])
@@ -398,21 +439,20 @@ def getTopTagsForAlbum (artist, album): #album.getTopTags
 
 
 def getSimilarArtists (artist, limit): #artist.getSimilar
+    params = {'method' : 'artist.getsimilar', 'artist' : artist, 'limit' : limit, 'api_key': API_KEY, 'format' : 'json'} 
     result = []
-    URL = similarArtistsURL + "&artist=" + artist + "&limit=" + str(limit) + "&api_key=" + API_KEY  + "&format=json" + "&autocorrect=1"
-
+    
     try:
-        response = urllib.urlopen(URL)
-        data = json.loads(response.read())
-
-    except:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
         return None
 
-    if 'error' in data:
-        print data
+    if 'error' in response:
+        print response['message']
         return None
     else:
-        for a in data['similarartists']['artist']:
+        for a in response['similarartists']['artist']:
             temp_list = []
             temp_list.append(a['name'])
             temp_list.append(a['match'])
@@ -424,21 +464,20 @@ def getSimilarArtists (artist, limit): #artist.getSimilar
 
 
 def getTopAlbumsByTag (tag, limit):
+    params = {'method' : 'tag.gettopalbums', 'tag' : tag, 'limit' : limit, 'api_key': API_KEY, 'format' : 'json'} 
     result = []
-    URL = tagTopAlbumsURL + "&tag=" + tag + "&api_key=" + API_KEY + "&limit=" + str(limit) + "&format=json"
-
+    
     try:
-        response = urllib.urlopen(URL)
-        data = json.loads(response.read())
-
-    except:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
         return None
 
-    if 'error' in data:
-        print data
+    if 'error' in response:
+        print response['message']
         return None
     else:
-        for album in data['albums']['album']:
+        for album in response['albums']['album']:
             temp_list = [] 
             temp_list.append(album['artist']['name'])
             temp_list.append(album['name'])
@@ -448,4 +487,22 @@ def getTopAlbumsByTag (tag, limit):
     return result
 
 
-#TODO: tag.getTopTracks
+
+def getTagInfo (tag):
+    params = {'method' : 'tag.getinfo', 'tag' : tag, 'api_key': API_KEY, 'format' : 'json'} 
+    result = []
+    
+    try:
+        response = requests.post(URL, data=params, timeout=5).json()
+    except requests.exceptions.RequestException as e:
+        print e
+        return None
+
+    if 'error' in response:
+        print response['message']
+        return None
+    else:
+        if response['tag']['wiki']['content'] == "":
+            return None
+        else: 
+            return response['tag']['wiki']['content']
