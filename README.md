@@ -33,7 +33,7 @@ parameters:
 <li>playlistName (optional): default = "{lastFMUserName}'s Top Songs"</li>
 </ul>
 
-<code>main.py gettop lastFMUserName="yourUserName" --period=6month --count=30</code>
+<code>main.py usertoptracks lastFMUserName="yourUserName" --period=6month --count=30</code>
 
 <h3>Get Loved Tracks</h3>
 
@@ -43,7 +43,19 @@ parameters:
 <li>playlistName (optional): default = "Loved Songs by {lastFMUserName}"</li>
 </ul>
 
-<code>main.py getloved "yourUserName"</code>
+<code>main.py userlovedtracks "yourUserName"</code>
+
+<h3>Get Top Albums</h3>
+
+parameters: 
+<ul>
+<li>lastFMUserName (required): </li>
+<li>period (optional): 7day | 1month | 3month | 6month | 12month | overall. default = 1month</li>
+<li>count (optional): default = 20</li>
+<li>playlistName (optional): default = "{lastFMUserName}'s Top Songs"</li>
+</ul>
+
+<code>main.py usertopalbums lastFMUserName="yourUserName" --period=6month --count=30</code>
 
 <h3>Get Top Tracks by Country</h3>
 
@@ -56,7 +68,7 @@ parameters:
 <li>playlistName (optional): default = "{country} Top {count}"</li>
 </ul>
 
-<code>main.py gettopbycounty --country=turkey --count=100</code>
+<code>main.py toptracksbycountry --country=turkey --count=100</code>
 
 <h3>Get Top Tracks by an Artist</h3>
 
@@ -67,7 +79,7 @@ parameters:
 <li>playlistName (optional): default = "The best {artist} songs"</li>
 </ul>
 
-<code>main.py gettopbyartist --artist="muse" --count="10"</code>
+<code>main.py toptracksbyartist --artist="muse" --count="10"</code>
 
 <h3>Get Top Tracks by Tag</h3>
 
@@ -80,7 +92,7 @@ parameters:
 <li>playlistName (optional): default = "Top {tag} songs"</li>
 </ul>
 
-<code>main.py gettopbytag --tag="indie"</code>
+<code>main.py toptracksbytag --tag="indie"</code>
 
 <h3>Get Chart Top Tracks</h3>
 
@@ -92,13 +104,38 @@ parameters:
 <li>playlistName (optional): default = "Top songs by Last.FM"</li>
 </ul>
 
-<code>main.py getcharttoptracks"</code>
+<code>main.py toptrackschart</code>
 
 <h3>Show Top Tags</h3>
 
 Use this to view the most popular tags on Last.fm
 
 <code>main.py showtoptags</code>
+
+<h3>Show Top Tags For A Track</h3>
+
+Returns the top tags for given track
+
+parameters: 
+<ul>
+<li>artist (required)</li>
+<li>track (required)</li>
+</ul>
+
+<code>main.py showtoptagsfortrack --artist="therion" --track="birt of venus illegitima</code>
+
+<h3>Show Top Artists by Country</h3>
+
+It shows the most popular artists on Last.FM by country.
+
+parameters: 
+<ul>
+<li>country (required)</li>
+</ul>
+
+<code>main.py showtopartistsbycountry --country=turkey</code>
+
+...
 
 <h2>Requirements:</h2>
 <ul>
