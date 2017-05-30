@@ -137,6 +137,8 @@ parameters:
 
 ...
 
+...
+
 <h2>Requirements:</h2>
 <ul>
 <li><a href = "https://github.com/plamere/spotipy">spotipy</a></li>
