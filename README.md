@@ -8,7 +8,17 @@ Generate playlists for your spotify account from command line interface:
 <li>top tracks by an artist, country or tag.</li>
 </ul>
 
-<h2> Usage</h2>
+<h2>Installation</h2>
+<ol>
+<li>Clone repository</li>
+<li>Install requirements</li>
+<li>Fill config.ini file with your API keys</li>
+<li>Use one of the functions below</li>
+</ol>
+<p><strong>Note:</strong> On the first run, open given url with a browser and complete authorization. Then paste redirected url to the console.</p>
+
+<h2>Usage</h2>
+
 <h3>Get Similar Tracks</h3>
 
 parameters: 
