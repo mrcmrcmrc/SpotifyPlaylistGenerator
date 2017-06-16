@@ -122,7 +122,7 @@ parameters:
 <li>track (required)</li>
 </ul>
 
-<code>main.py showtoptagsfortrack --artist="therion" --track="birt of venus illegitima</code>
+<code>main.py showtoptagsfortrack --artist="therion" --track="birt of venus illegitima"</code>
 
 <h3>Show Top Artists by Country</h3>
 
@@ -133,7 +133,7 @@ parameters:
 <li>country (required)</li>
 </ul>
 
-<code>main.py showtopartistsbycountry --country=turkey</code>
+<code>main.py showtopartistsbycountry --country="turkey"</code>
 
 ...
 
