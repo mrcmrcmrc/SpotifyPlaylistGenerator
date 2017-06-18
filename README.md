@@ -10,7 +10,7 @@ Generate playlists for your spotify account from command line interface:
 
 <h2>Installation</h2>
 <ol>
-<li>Clone repository</li>
+<li>Download repository</li>
 <li>Install requirements</li>
 <li>Fill config.ini file with your API keys</li>
 <li>Use one of the functions below</li>
